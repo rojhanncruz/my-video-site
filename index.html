@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Private Cinema | Rojhann</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #080b12;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: #121725;
+  border: 1px solid #293146;
+  padding: 30px 24px;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.lock { font-size: 48px; }
+
+.description {
+  color: #a6aec1;
+  line-height: 1.6;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin: 22px 0 8px;
+}
+
+input, button, .watch {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+input {
+  background: #090e19;
+  border: 1px solid #39445d;
+  color: white;
+}
+
+button, .watch {
+  margin-top: 13px;
+  border: 0;
+  background: #5577ff;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+button:hover, .watch:hover { background: #3d60ed; }
+
+#message { color: #ff707c; min-height: 20px; }
+
+.credit {
+  color: #8792aa;
+  font-size: 13px;
+  margin-top: 24px;
+}
+
+/* Cinema page */
+#cinema {
+  display: none;
+  width: 100%;
+  max-width: 850px;
+  text-align: center;
+}
+
+#cinema h1 { font-size: 30px; }
+
+.cinema-panel {
+  padding: 35px 20px;
+  background: #121725;
+  border: 1px solid #293146;
+  border-radius: 18px;
+}
+
+#cinema:fullscreen {
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#cinema:fullscreen .cinema-panel {
+  width: min(900px, 100%);
+  border: none;
+  background: #000;
+}
+
+#cinema:fullscreen .credit { display: none; }
+
+.small {
+  color: #a6aec1;
+  font-size: 12px;
+  line-height: 1.6;
+}
+</style>
+</head>
+
+<body>
+
+<main class="card" id="login">
+  <div class="lock">🔒</div>
+  <h1>Private Cinema</h1>
+  <p class="description">
+    Enter your password to unlock the video.
+  </p>
+
+  <form id="form">
+    <label for="password">Enter password</label>
+    <input id="password" type="password"
+      placeholder="Enter password..." required>
+    <button type="submit">Enter Password</button>
+  </form>
+
+  <p id="message" role="status"></p>
+  <div class="credit">Made by Rojhann</div>
+</main>
+
+<section id="cinema">
+  <div class="cinema-panel">
+    <h1>🎬 Private Cinema</h1>
+    <p class="description">Your video is ready.</p>
+
+    <button id="soundButton">🔊 Play sound</button>
+    <button id="fullButton">⛶ Full Screen</button>
+
+    <a class="watch" id="watchButton"
+      href="https://mega.nz/file/rWBFiJ4Z#sXMByQY5fKRqAG4_tmHq7uiBNd03ar54cOOYf8kSyYo"
+      target="_blank" rel="noopener noreferrer">
+      ▶ Open 4K Video
+    </a>
+
+    <p class="small">
+      Full Screen hides the website interface, where supported.
+      Open Video takes you to MEGA.
+    </p>
+    <div class="credit">Made by Rojhann</div>
+  </div>
+</section>
+
+<script>
+const correctPassword = "PeterTaton";
+const login = document.getElementById("login");
+const cinema = document.getElementById("cinema");
+const form = document.getElementById("form");
+const password = document.getElementById("password");
+const message = document.getElementById("message");
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  if (password.value === correctPassword) {
+    login.style.display = "none";
+    cinema.style.display = "block";
+
+    // Short confirmation sound using the Web Audio API.
+    try {
+      const audio = new (window.AudioContext ||
+        window.webkitAudioContext)();
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.value = 880;
+      gain.gain.value = 0.12;
+
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start();
+      oscillator.stop(audio.currentTime + 0.18);
+    } catch (e) {
+      // The website still works if audio is unavailable.
+    }
+  } else {
+    message.textContent = "❌ Wrong password! Try again.";
+    password.value = "";
+  }
+});
+
+document.getElementById("fullButton").addEventListener("click", async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await cinema.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (e) {
+    alert("Full Screen isn't supported here. Try opening the site in Chrome.");
+  }
+});
+
+document.getElementById("soundButton").addEventListener("click", () => {
+  try {
+    const audio = new (window.AudioContext ||
+      window.webkitAudioContext)();
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+
+    oscillator.frequency.value = 660;
+    gain.gain.value = 0.12;
+    oscillator.connect(gain);
+    gain.connect(audio.destination);
+    oscillator.start();
+    oscillator.stop(audio.currentTime + 0.25);
+  } catch (e) {
+    alert("Sound isn't available in this browser.");
+  }
+});
+</script>
+
+</body>
+</html>
